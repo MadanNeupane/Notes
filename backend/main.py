@@ -1,4 +1,5 @@
 from config import app, db
+from models import User
 
 @app.route("/", methods=["GET"])
 def index():

@@ -1,7 +1,8 @@
 from flask import request, jsonify
+from datetime import datetime
 from config import app, db
-from models import User
-
+from models import User, Note
+from auth_helpers import login_required
 
 # Register new user
 @app.route("/register", methods=["POST"])
@@ -55,13 +56,74 @@ if __name__ == "__main__":
     app.run(debug=True)
 
 
+# Create new note
+@app.route('/notes', methods=['POST'])
+@login_required
+def create_note(current_user):
+    data = request.json
+
+    if 'content' not in data or not data['content']:
+        return jsonify({"error": "Content is required"}), 400
+
+    reminder_time = data.get('reminder_time', None)
+    if reminder_time:
+        reminder_time = datetime.strptime(reminder_time, "%Y-%m-%d %H:%M:%S")
+
+    note = Note(content=data['content'], reminder_time=reminder_time, user_id=current_user.id)
+    db.session.add(note)
+    db.session.commit()
+
+    return jsonify(note.to_json()), 201
+
+# Get all notes
+@app.route('/notes', methods=['GET'])
+@login_required
+def get_notes(current_user):
+    notes = Note.query.filter_by(user_id=current_user.id).all()
+    return jsonify([note.to_json() for note in notes]), 200
+
+# Get single note
+@app.route('/notes/<int:note_id>', methods=['GET'])
+@login_required
+def get_note(current_user, note_id):
+    note = Note.query.filter_by(id=note_id, user_id=current_user.id).first()
+    if note is None:
+        return jsonify({"error": "Note not found"}), 404
+    return jsonify(note.to_json()), 200
+
+# Update note
+@app.route('/notes/<int:note_id>', methods=['PUT'])
+@login_required
+def update_note(current_user, note_id):
+    data = request.json
+    note = Note.query.filter_by(id=note_id, user_id=current_user.id).first()
+
+    if note is None:
+        return jsonify({"error": "Note not found"}), 404
+
+    if 'content' in data:
+        note.content = data['content']
+
+    if 'reminder_time' in data:
+        note.reminder_time = datetime.strptime(data['reminder_time'], "%Y-%m-%d %H:%M:%S")
+
+    db.session.commit()
+    return jsonify(note.to_json()), 200
+
+# Delete note
+@app.route('/notes/<int:note_id>', methods=['DELETE'])
+@login_required
+def delete_note(current_user, note_id):
+    note = Note.query.filter_by(id=note_id, user_id=current_user.id).first()
+
+    if note is None:
+        return jsonify({"error": "Note not found"}), 404
+
+    db.session.delete(note)
+    db.session.commit()
+    return jsonify({"message": "Note deleted successfully"}), 200
+
 # TODO:
-# 1. Create new note
-# 2. Update existing note
-# 3. Delete existing note
-# 4. Get all notes
-# 5. Get single note
 # 6. Search for notes based on content
-# 7. Get all users
 # 8. Set reminder on notes
 # 9. Send email to users with reminders

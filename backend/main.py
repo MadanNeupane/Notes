@@ -152,11 +152,14 @@ def create_or_update_reminder():
     if reminder:
         # Update the existing reminder
         reminder.note.reminder_time = reminder_time
+        reminder.last_delivered_at = None
+        reminder.is_sent = False
         db.session.commit()
         return jsonify({'message': 'Reminder updated successfully'}), 200
     else:
         # Create a new reminder
         new_reminder = Reminder(note_id=note_id)
+        new_reminder.note.reminder_time = reminder_time
         db.session.add(new_reminder)
         db.session.commit()
         return jsonify({'message': 'Reminder created successfully'}), 201

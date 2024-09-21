@@ -117,6 +117,10 @@ const Notes = () => {
   };
 
   const createNote = async () => {
+    if (!newNote) {
+      showToastMessage("You can not save an empty note");
+      return;
+    }
     try {
       await api.post("/notes", {
         content: newNote,
@@ -125,7 +129,33 @@ const Notes = () => {
       setNewNote("");
       setReminderTime(null);
       fetchNotes();
-      showToastMessage("Note created successfully");
+
+      if (reminderTime) {
+        // remaining time for the reminder
+        const now = new Date();
+        const timeDifference = reminderTime.getTime() - now.getTime(); // Difference in milliseconds
+
+        // Convert milliseconds to seconds, minutes, hours, or days
+        const seconds = Math.floor(timeDifference / 1000);
+        const minutes = Math.floor(seconds / 60);
+        const hours = Math.floor(minutes / 60);
+        const days = Math.floor(hours / 24);
+
+        let timeMessage;
+        if (days > 0) {
+          timeMessage = `${days} day${days > 1 ? 's' : ''} from now`;
+        } else if (hours > 0) {
+          timeMessage = `${hours} hour${hours > 1 ? 's' : ''} from now`;
+        } else if (minutes > 0) {
+          timeMessage = `${minutes} minute${minutes > 1 ? 's' : ''} from now`;
+        } else {
+          timeMessage = `${seconds} second${seconds > 1 ? 's' : ''} from now`;
+        }
+
+        showToastMessage(`Note created successfully. You'll be reminded in ${timeMessage}`);
+      } else {
+        showToastMessage("Note created successfully");
+      }
     } catch (err) {
       showToastMessage("Error creating note");
       console.error("Error creating note", err);

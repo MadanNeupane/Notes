@@ -49,18 +49,6 @@ def login():
     return jsonify({"error": "Invalid credentials"}), 401
 
 
-@app.route("/", methods=["GET"])
-def index():
-    return "Start of the Levo assignment"
-
-
-if __name__ == "__main__":
-    with app.app_context():
-        db.create_all() # Create database when app starts
-
-    app.run(debug=True)
-
-
 # Create new note
 @app.route('/notes', methods=['POST'])
 @login_required
@@ -132,3 +120,10 @@ def delete_note(current_user, note_id):
 # 6. Search for notes based on content
 # 8. Set reminder on notes
 # 9. Send email to users with reminders
+
+
+if __name__ == "__main__":
+    with app.app_context():
+        db.create_all() # Create database when app starts
+
+    app.run(debug=True)

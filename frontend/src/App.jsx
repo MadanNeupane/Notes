@@ -15,18 +15,24 @@ const Logout = () => {
 
 
 const App = () => {
-  const [loggedIn, setLoggedIn] = useState(false)
-  const [userName, setUserName] = useState('')
+  const [loggedIn, setLoggedIn] = useState(false);
+  const [userName, setUserName] = useState('');
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const token = localStorage.getItem('token')
-    const userName = localStorage.getItem('username')
+    const token = localStorage.getItem('token');
+    const storedUserName = localStorage.getItem('username');
 
     if (token) {
-      setLoggedIn(true)
-      setUserName(userName)
+      setLoggedIn(true);
+      setUserName(storedUserName);
     }
-  }, [])
+    setLoading(false);
+  }, []);
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <BrowserRouter>

@@ -16,6 +16,13 @@ const Notes = () => {
     fetchNotes();
   }, []);
 
+  const filterPassedTime = (time) => {
+    const currentDate = new Date();
+    const selectedDate = new Date(time);
+
+    return currentDate.getTime() < selectedDate.getTime();
+  };
+
   const fetchNotes = async () => {
     try {
       const response = await api.get("/notes", {
@@ -95,6 +102,7 @@ const Notes = () => {
           selected={reminderTime}
           onChange={(date) => setReminderTime(date)}
           minDate={new Date()}
+          filterTime={filterPassedTime}
           showTimeSelect
           dateFormat="Pp"
           className="form-control mt-2"
@@ -134,6 +142,8 @@ const Notes = () => {
             <DatePicker
               selected={reminderTime}
               onChange={(date) => setReminderTime(date)}
+              minDate={new Date()}
+              filterTime={filterPassedTime}
               showTimeSelect
               dateFormat="Pp"
               className="form-control"

@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import api from "../../api";
-import { Modal, Button, Form, Toast, Card } from "react-bootstrap";
+import { Modal, Button, Form, ToastContainer, Toast, Card } from "react-bootstrap";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import ReactQuill from "react-quill";
@@ -183,10 +183,6 @@ const Notes = () => {
         <button className="btn btn-secondary" onClick={handleLogout}>Logout</button>
       </div>
 
-      <Toast show={showToast} onClose={() => setShowToast(false)} className="mb-3">
-        <Toast.Body>{toastMessage}</Toast.Body>
-      </Toast>
-
       <Card className="mb-3 p-3">
         <ReactQuill
           theme="snow"
@@ -292,6 +288,13 @@ const Notes = () => {
           <Button variant="primary" onClick={updateNote}>Save Changes</Button>
         </Modal.Footer>
       </Modal>
+
+      {/* Toast Message */}
+      <ToastContainer position="bottom-center" className="p-3">
+        <Toast show={showToast} onClose={() => setShowToast(false)} className="mb-3">
+          <Toast.Body>{toastMessage}</Toast.Body>
+        </Toast>
+      </ToastContainer>
     </div>
   );
 };

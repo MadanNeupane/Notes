@@ -15,3 +15,14 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
 jwt = JWTManager(app)
+
+CELERY_BROKER_URL = os.getenv('CELERY_BROKER_URL')  # Redis URL
+CELERY_RESULT_BACKEND = os.getenv('CELERY_RESULT_BACKEND')
+
+# Flask-Mail Configuration
+MAIL_SERVER = os.getenv('MAIL_SERVER')
+MAIL_PORT = 587
+MAIL_USE_TLS = True
+MAIL_USERNAME = os.getenv('MAIL_USERNAME')
+MAIL_PASSWORD = os.getenv('MAIL_PASSWORD')
+MAIL_DEFAULT_SENDER = os.getenv('MAIL_DEFAULT_SENDER')

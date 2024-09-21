@@ -6,7 +6,6 @@ from models import User
 
 
 SECRET_KEY = os.getenv("JWT_SECRET_KEY")
-print(SECRET_KEY, "SECRET_KEY")
 
 def get_current_user():
     token = request.headers.get('Authorization')

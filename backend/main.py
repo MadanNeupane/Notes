@@ -49,30 +49,44 @@ def login():
     return jsonify({"error": "Invalid credentials"}), 401
 
 
+# Helper function to parse reminder time
+def parse_reminder_time(reminder_time_str):
+    try:
+        return datetime.strptime(reminder_time_str, "%Y-%m-%d %H:%M:%S")
+    except (ValueError, TypeError):
+        return None
+
+
 # Create new note
 @app.route('/notes', methods=['POST'])
 @login_required
 def create_note(current_user):
     data = request.json
 
-    if 'content' not in data or not data['content']:
+    content = data.get('content')
+    if not content:
         return jsonify({"error": "Content is required"}), 400
 
-    reminder_time = data.get('reminder_time', None)
-    if reminder_time:
-        reminder_time = datetime.strptime(reminder_time, "%Y-%m-%d %H:%M:%S")
+    reminder_time_str = data.get('reminder_time')
+    reminder_time = parse_reminder_time(reminder_time_str)
 
-    note = Note(content=data['content'], reminder_time=reminder_time, user_id=current_user.id)
+    note = Note(content=content, reminder_time=reminder_time, user_id=current_user.id)
     db.session.add(note)
     db.session.commit()
 
     return jsonify(note.to_json()), 201
 
-# Get all notes
+# Get all notes or search by content
 @app.route('/notes', methods=['GET'])
 @login_required
 def get_notes(current_user):
-    notes = Note.query.filter_by(user_id=current_user.id).all()
+    search_query = request.args.get('search', '').strip()
+
+    if search_query:
+        notes = Note.query.filter(Note.user_id == current_user.id, Note.content.ilike(f"%{search_query}%")).all()
+    else:
+        notes = Note.query.filter_by(user_id=current_user.id).all()
+
     return jsonify([note.to_json() for note in notes]), 200
 
 # Get single note
@@ -94,11 +108,14 @@ def update_note(current_user, note_id):
     if note is None:
         return jsonify({"error": "Note not found"}), 404
 
-    if 'content' in data:
-        note.content = data['content']
+    content = data.get('content')
+    if content:
+        note.content = content
 
-    if 'reminder_time' in data:
-        note.reminder_time = datetime.strptime(data['reminder_time'], "%Y-%m-%d %H:%M:%S")
+    reminder_time_str = data.get('reminder_time')
+    reminder_time = parse_reminder_time(reminder_time_str)
+    if reminder_time:
+        note.reminder_time = reminder_time
 
     db.session.commit()
     return jsonify(note.to_json()), 200
@@ -117,7 +134,6 @@ def delete_note(current_user, note_id):
     return jsonify({"message": "Note deleted successfully"}), 200
 
 # TODO:
-# 6. Search for notes based on content
 # 8. Set reminder on notes
 # 9. Send email to users with reminders
 

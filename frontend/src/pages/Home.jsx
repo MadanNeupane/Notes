@@ -1,30 +1,63 @@
-import { Link } from 'react-router-dom'
-import Notes from './home/Notes'
+import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
+import api from '../api';
+import { Container, Row, Col, Button, Card } from 'react-bootstrap';
 
-const Home = ({ loggedIn, userName }) => {
-  return (
-    <div className="main-container">
-      <div className="title-container">Welcome!</div>
-      <div className="button-container">
-        {loggedIn ?
-          <>
-          <h3>Logged in as {userName}</h3>
-          <Link className="input-button" to="/notes">View Notes</Link>
-          <Link className="input-button" to="/logout">Logout</Link>
-          </>
-          :
-          <div className="input-container">
-            <Link to="/login">
-              <button className="input-button">Login</button>
-            </Link>
-            <Link to="/register">
-              <button className="input-button">Register</button>
-            </Link>
-          </div>
+const Home = ({ loggedIn }) => {
+  const [username, setUsername] = useState('');
+
+  useEffect(() => {
+    if (loggedIn) {
+      const fetchUser = async () => {
+        try {
+          const response = await api.get('/me');
+          setUsername(response.data.username);
+        } catch (err) {
+          console.error('Error fetching user data', err);
         }
-      </div>
-    </div>
-  )
-}
+      };
 
-export default Home
+      fetchUser();
+    }
+  }, [loggedIn]);
+
+  return (
+    <Container className="d-flex align-items-center justify-content-center min-vh-100">
+      <Row className="text-center">
+        <Col md={12}>
+          <h1 className="display-4">Welcome to LevoNotes!</h1>
+          <p className="lead">Keep track of your tasks and never miss a reminder.</p>
+
+          {loggedIn ? (
+            <>
+              <Card className="mt-4">
+                <Card.Body>
+                  <h3>Logged in as <strong>{username}</strong></h3>
+                  <div className="mt-3">
+                    <Link to="/notes">
+                      <Button variant="primary" className="mx-2">View Notes</Button>
+                    </Link>
+                    <Link to="/logout">
+                      <Button variant="danger" className="mx-2">Logout</Button>
+                    </Link>
+                  </div>
+                </Card.Body>
+              </Card>
+            </>
+          ) : (
+            <div className="mt-4">
+              <Link to="/login">
+                <Button variant="primary" className="mx-2">Login</Button>
+              </Link>
+              <Link to="/register">
+                <Button variant="secondary" className="mx-2">Register</Button>
+              </Link>
+            </div>
+          )}
+        </Col>
+      </Row>
+    </Container>
+  );
+};
+
+export default Home;

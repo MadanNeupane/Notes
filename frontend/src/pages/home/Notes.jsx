@@ -144,13 +144,6 @@ const Notes = () => {
         </div>
       </Card>
 
-      {/* Notes List */}
-      {notes.length === 0 ? (
-        <p>No notes found</p>
-      ) : (
-      <>
-      {/* Search Input */}
-      <h4>My Notes</h4>
       <div className="form-group mb-3">
         <input
           type="text"
@@ -160,6 +153,13 @@ const Notes = () => {
           onChange={handleSearchChange}
         />
       </div>
+      {/* Notes List */}
+      {notes.length === 0 ? (
+        <p>No notes found</p>
+      ) : (
+      <>
+      {/* Search Input */}
+      <h4>My Notes</h4>
       <ul className="list-group">
         {notes.map((note) => (
           <li key={note.id} className="list-group-item d-flex justify-content-between align-items-center">

@@ -5,7 +5,7 @@ import Register from './pages/accounts/Register'
 import Home from './pages/Home'
 import Notes from './pages/home/Notes'
 import NotFound from './pages/NotFound'
-import './App.css'
+// import './App.css'
 
 
 const Logout = () => {
@@ -43,7 +43,7 @@ const App = () => {
         />
         <Route path="/register" element={<Register />} />
         <Route path="/logout" element={<Logout />} />
-        <Route path="/" element={<Home loggedIn={loggedIn} userName={userName} />} />
+        <Route path="/" element={<Home loggedIn={loggedIn} />} />
         <Route path="/notes" element={loggedIn ? <Notes /> : <Navigate to="/login" />} />
         <Route path="*" element={<NotFound />} />
       </Routes>

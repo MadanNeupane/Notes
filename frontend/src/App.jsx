@@ -1,14 +1,27 @@
-import { useState } from 'react'
-import './App.css'
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import Login from './pages/accounts/Login'
+import Register from './pages/accounts/Register'
+import Notes from './pages/home/Notes'
+import NotFound from './pages/NotFound'
 
-function App() {
 
+const Logout = () => {
+  localStorage.clear()
+  return <Navigate to="/login" />
+}
+
+
+const App = () => {
   return (
-    <>
-      <div className="App">
-        <h1>Start of the Levo assignment - Frontend</h1>
-      </div>
-    </>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/logout" element={<Logout />} />
+        <Route path="/" element={<Notes />} />
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    </BrowserRouter>
   )
 }
 

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import api from "../../api";
 import { Modal, Button, Form, Toast, Card } from "react-bootstrap";
 import DatePicker from "react-datepicker";
@@ -18,6 +18,9 @@ const Notes = () => {
   const [toastMessage, setToastMessage] = useState("");
   const [showToast, setShowToast] = useState(false);
   const [username, setUsername] = useState("");
+  const [autosaveEnabled, setAutosaveEnabled] = useState(false); // Autosave toggle
+
+  const autosaveTimeoutRef = useRef(null); // Timeout reference for autosave
 
   useEffect(() => {
     fetchNotes();
@@ -38,6 +41,24 @@ const Notes = () => {
       setFilteredNotes(notes);
     }
   }, [searchQuery, notes]);
+
+  // Watch for changes in the newNote and trigger autosave after 10 seconds of inactivity
+  useEffect(() => {
+    if (autosaveEnabled && newNote) {
+      // Clear any previous timeout
+      clearTimeout(autosaveTimeoutRef.current);
+
+      // Set a new timeout for 10 seconds
+      autosaveTimeoutRef.current = setTimeout(() => {
+        createNote();
+        setNewNote(""); // Clear editor after autosave
+        showToastMessage("Note autosaved successfully");
+      }, 10000);
+    }
+
+    // Cleanup function to clear the timeout
+    return () => clearTimeout(autosaveTimeoutRef.current);
+  }, [newNote, autosaveEnabled]);
 
   const filterPassedTime = time => {
     const currentDate = new Date();
@@ -173,9 +194,19 @@ const Notes = () => {
               placeholderText="Set reminder (optional)"
             />
           </div>
-          <button className="btn btn-success mt-2" onClick={createNote}>
-            Add Note
-          </button>
+          <div className="d-flex align-items-center justify-content-between mt-3">
+            <button className="btn btn-success" onClick={createNote}>
+              Add Note
+            </button>
+            <Form.Check
+              type="switch"
+              id="autosave-switch"
+              label="Enable Autosave"
+              title="This will save your note in 10 seconds of inactivity"
+              checked={autosaveEnabled}
+              onChange={() => setAutosaveEnabled(!autosaveEnabled)}
+            />
+          </div>
         </div>
       </Card>
 
@@ -245,12 +276,12 @@ const Notes = () => {
               theme="snow"
               value={currentNote?.content || ""}
               onChange={content =>
-                setCurrentNote({ ...currentNote, content })
+                setCurrentNote(prevNote => ({ ...prevNote, content }))
               }
             />
           </Form.Group>
-          <Form.Group className="mt-3">
-            <Form.Label>Reminder Time (optional)</Form.Label>
+          <Form.Group>
+            <Form.Label>Reminder Time</Form.Label>
             <DatePicker
               selected={modalReminderTime}
               onChange={date => setModalReminderTime(date)}

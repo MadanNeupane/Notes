@@ -48,6 +48,12 @@ def login():
 
     return jsonify({"error": "Invalid credentials"}), 401
 
+# Get user profile
+@app.route("/me", methods=["GET"])
+@login_required
+def me(current_user):
+    user = User.query.get(current_user.id)
+    return jsonify(user.to_json()), 200
 
 # Helper function to parse reminder time
 def parse_reminder_time(reminder_time_str):

@@ -1,5 +1,6 @@
 from flask import request, jsonify
-from datetime import datetime
+from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
+from datetime import datetime, timedelta
 from config import app, db
 from models import User, Note
 from auth_helpers import login_required
@@ -39,7 +40,11 @@ def login():
     user = User.query.filter_by(email=email).first()
 
     if user and user.check_password(password):
-        return user.to_json()
+        access_token = create_access_token(identity=user.id, expires_delta=timedelta(hours=1))  # 1 hour expiration
+        return jsonify({
+            "token": access_token,
+            "username": user.username
+        }), 200
 
     return jsonify({"error": "Invalid credentials"}), 401
 

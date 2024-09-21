@@ -1,8 +1,11 @@
+import { useEffect, useState } from 'react'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import Login from './pages/accounts/Login'
 import Register from './pages/accounts/Register'
+import Home from './pages/Home'
 import Notes from './pages/home/Notes'
 import NotFound from './pages/NotFound'
+import './App.css'
 
 
 const Logout = () => {
@@ -12,13 +15,30 @@ const Logout = () => {
 
 
 const App = () => {
+  const [loggedIn, setLoggedIn] = useState(false)
+  const [userName, setUserName] = useState('')
+
+  useEffect(() => {
+    const token = localStorage.getItem('token')
+    const userName = localStorage.getItem('username')
+
+    if (token) {
+      setLoggedIn(true)
+      setUserName(userName)
+    }
+  }, [])
+
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/login" element={<Login />} />
+        <Route
+          path="/login"
+          element={<Login setLoggedIn={setLoggedIn} setUserName={setUserName} />}
+        />
         <Route path="/register" element={<Register />} />
         <Route path="/logout" element={<Logout />} />
-        <Route path="/" element={<Notes />} />
+        <Route path="/" element={<Home loggedIn={loggedIn} userName={userName} />} />
+        <Route path="/notes" element={loggedIn ? <Notes /> : <Navigate to="/login" />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>

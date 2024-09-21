@@ -7,9 +7,10 @@ import "react-datepicker/dist/react-datepicker.css";
 const Notes = () => {
   const [notes, setNotes] = useState([]);
   const [newNote, setNewNote] = useState("");
-  const [reminderTime, setReminderTime] = useState(new Date());
-  const [modalReminderTime, setModalReminderTime] = useState(new Date());
+  const [reminderTime, setReminderTime] = useState(null); // Optional reminder time
+  const [modalReminderTime, setModalReminderTime] = useState(null); // Optional modal reminder time
   const [searchQuery, setSearchQuery] = useState("");
+  const [filteredNotes, setFilteredNotes] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [currentNote, setCurrentNote] = useState(null);
   const [toastMessage, setToastMessage] = useState("");
@@ -18,8 +19,21 @@ const Notes = () => {
 
   useEffect(() => {
     fetchNotes();
-    fetchUser(); // Fetch username
+    fetchUser();
   }, []);
+
+  useEffect(() => {
+    // Update filtered notes when search query changes
+    if (searchQuery) {
+      setFilteredNotes(
+        notes.filter(note =>
+          note.content.toLowerCase().includes(searchQuery.toLowerCase())
+        )
+      );
+    } else {
+      setFilteredNotes(notes);
+    }
+  }, [searchQuery, notes]);
 
   const filterPassedTime = (time) => {
     const currentDate = new Date();
@@ -29,7 +43,7 @@ const Notes = () => {
 
   const fetchNotes = async () => {
     try {
-      const response = await api.get("/notes", { params: { search: searchQuery } });
+      const response = await api.get("/notes");
       setNotes(response.data.reverse());
     } catch (err) {
       showToastMessage("Error fetching notes");
@@ -52,11 +66,33 @@ const Notes = () => {
     setTimeout(() => setShowToast(false), 3000);
   };
 
+  const formatReminderTime = (date) => {
+    return date ? date.toISOString().slice(0, 19).replace('T', ' ') : null;
+  };
+
+  const handleShowModal = (note) => {
+    setCurrentNote(note);
+    setModalReminderTime(note.reminder_time ? new Date(note.reminder_time) : null);
+    setShowModal(true);
+  };
+
+  const handleSearchChange = (e) => {
+    setSearchQuery(e.target.value);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    window.location.href = "/login";
+  };
+
   const createNote = async () => {
     try {
-      await api.post("/notes", { content: newNote, reminder_time: reminderTime });
+      await api.post("/notes", {
+        content: newNote,
+        reminder_time: formatReminderTime(reminderTime), // Handle optional reminder time
+      });
       setNewNote("");
-      setReminderTime(new Date());
+      setReminderTime(null);
       fetchNotes();
       showToastMessage("Note created successfully");
     } catch (err) {
@@ -76,17 +112,11 @@ const Notes = () => {
     }
   };
 
-  const handleShowModal = (note) => {
-    setCurrentNote(note);
-    setModalReminderTime(new Date(note.reminder_time || Date.now()));
-    setShowModal(true);
-  };
-
   const updateNote = async () => {
     try {
       await api.put(`/notes/${currentNote.id}`, {
         content: currentNote.content,
-        reminder_time: modalReminderTime,
+        reminder_time: formatReminderTime(modalReminderTime), // Handle optional reminder time
       });
       fetchNotes();
       setShowModal(false);
@@ -95,16 +125,6 @@ const Notes = () => {
       showToastMessage("Error updating note");
       console.error("Error updating note", err);
     }
-  };
-
-  const handleSearchChange = (e) => {
-    setSearchQuery(e.target.value);
-    fetchNotes();
-  };
-
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    window.location.href = "/login";
   };
 
   return (
@@ -138,6 +158,8 @@ const Notes = () => {
               showTimeSelect
               dateFormat="Pp"
               className="form-control"
+              isClearable
+              placeholderText="Set reminder (optional)"
             />
           </div>
           <button className="btn btn-success mt-2" onClick={createNote}>Add Note</button>
@@ -154,18 +176,18 @@ const Notes = () => {
         />
       </div>
       {/* Notes List */}
-      {notes.length === 0 ? (
+      {filteredNotes.length === 0 ? (
         <p>No notes found</p>
       ) : (
       <>
-      {/* Search Input */}
       <h4>My Notes</h4>
       <ul className="list-group">
-        {notes.map((note) => (
+        {filteredNotes.map((note) => (
           <li key={note.id} className="list-group-item d-flex justify-content-between align-items-center">
             <div className="d-flex flex-column">
               <span>{note.content}</span>
-              <small className="text-muted font-italic"><em>{new Date(note.created_at).toLocaleString()}</em></small>
+              <span className="text-muted">{note.reminder_time ? "Reminder set" : "No reminder set"}</span>
+              <small className="text-muted font-italic"><em>{note.reminder_time && new Date(note.reminder_time).toLocaleString()}</em></small>
             </div>
             <div>
               <button className="btn btn-warning mx-2" onClick={() => handleShowModal(note)}>Update</button>
@@ -192,7 +214,7 @@ const Notes = () => {
             />
           </Form.Group>
           <Form.Group className="mt-3">
-            <Form.Label>Reminder Time</Form.Label>
+            <Form.Label>Reminder Time (optional)</Form.Label>
             <DatePicker
               selected={modalReminderTime}
               onChange={(date) => setModalReminderTime(date)}
@@ -201,6 +223,8 @@ const Notes = () => {
               showTimeSelect
               dateFormat="Pp"
               className="form-control"
+              isClearable
+              placeholderText="Set reminder (optional)"
             />
           </Form.Group>
         </Modal.Body>

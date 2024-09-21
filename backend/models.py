@@ -47,3 +47,22 @@ class Note(db.Model):
             'reminder_time': self.reminder_time,
             'user_id': self.user_id
         }
+
+
+class Reminder(db.Model):
+    __tablename__ = 'reminders'
+
+    id = db.Column(db.Integer, primary_key=True)
+    note_id = db.Column(db.Integer, db.ForeignKey('notes.id'), nullable=False)
+    note = db.relationship('Note', backref='reminders')
+    is_sent = db.Column(db.Boolean, default=False)
+    last_delivered_at = db.Column(db.DateTime, nullable=True)
+
+    def to_json(self):
+        return {
+            'id': self.id,
+            'reminder_time': self.note.reminder_time,
+            'note_id': self.note_id,
+            'is_sent': self.is_sent,
+            'last_delivered_at': self.last_delivered_at
+        }

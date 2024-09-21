@@ -28,7 +28,7 @@ const Notes = () => {
       setFilteredNotes(
         notes.filter(note =>
           note.content.toLowerCase().includes(searchQuery.toLowerCase())
-        )
+        ).sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at))
       );
     } else {
       setFilteredNotes(notes);
@@ -44,7 +44,7 @@ const Notes = () => {
   const fetchNotes = async () => {
     try {
       const response = await api.get("/notes");
-      setNotes(response.data.reverse());
+      setNotes(response.data.sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at)));
     } catch (err) {
       showToastMessage("Error fetching notes");
       console.error("Error fetching notes", err);

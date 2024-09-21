@@ -3,6 +3,8 @@ import api from "../../api";
 import { Modal, Button, Form, Toast, Card } from "react-bootstrap";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import ReactQuill from "react-quill";
+import "react-quill/dist/quill.snow.css";
 
 const Notes = () => {
   const [notes, setNotes] = useState([]);
@@ -26,16 +28,18 @@ const Notes = () => {
     // Update filtered notes when search query changes
     if (searchQuery) {
       setFilteredNotes(
-        notes.filter(note =>
-          note.content.toLowerCase().includes(searchQuery.toLowerCase())
-        ).sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at))
+        notes
+          .filter(note =>
+            note.content.toLowerCase().includes(searchQuery.toLowerCase())
+          )
+          .sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at))
       );
     } else {
       setFilteredNotes(notes);
     }
   }, [searchQuery, notes]);
 
-  const filterPassedTime = (time) => {
+  const filterPassedTime = time => {
     const currentDate = new Date();
     const selectedDate = new Date(time);
     return currentDate.getTime() < selectedDate.getTime();
@@ -44,7 +48,11 @@ const Notes = () => {
   const fetchNotes = async () => {
     try {
       const response = await api.get("/notes");
-      setNotes(response.data.sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at)));
+      setNotes(
+        response.data.sort(
+          (a, b) => new Date(b.updated_at) - new Date(a.updated_at)
+        )
+      );
     } catch (err) {
       showToastMessage("Error fetching notes");
       console.error("Error fetching notes", err);
@@ -53,30 +61,32 @@ const Notes = () => {
 
   const fetchUser = async () => {
     try {
-      const response = await api.get('/me');
+      const response = await api.get("/me");
       setUsername(response.data.username);
     } catch (err) {
       console.error("Error fetching user data", err);
     }
   };
 
-  const showToastMessage = (message) => {
+  const showToastMessage = message => {
     setToastMessage(message);
     setShowToast(true);
     setTimeout(() => setShowToast(false), 3000);
   };
 
-  const formatReminderTime = (date) => {
-    return date ? date.toISOString().slice(0, 19).replace('T', ' ') : null;
+  const formatReminderTime = date => {
+    return date ? date.toISOString().slice(0, 19).replace("T", " ") : null;
   };
 
-  const handleShowModal = (note) => {
+  const handleShowModal = note => {
     setCurrentNote(note);
-    setModalReminderTime(note.reminder_time ? new Date(note.reminder_time) : null);
+    setModalReminderTime(
+      note.reminder_time ? new Date(note.reminder_time) : null
+    );
     setShowModal(true);
   };
 
-  const handleSearchChange = (e) => {
+  const handleSearchChange = e => {
     setSearchQuery(e.target.value);
   };
 
@@ -101,7 +111,7 @@ const Notes = () => {
     }
   };
 
-  const deleteNote = async (id) => {
+  const deleteNote = async id => {
     try {
       await api.delete(`/notes/${id}`);
       fetchNotes();
@@ -131,7 +141,9 @@ const Notes = () => {
     <div className="container mt-4">
       <div className="d-flex justify-content-end mb-3 align-items-center gap-2">
         <span>Hello, {username}</span>
-        <button className="btn btn-secondary" onClick={handleLogout}>Logout</button>
+        <button className="btn btn-secondary" onClick={handleLogout}>
+          Logout
+        </button>
       </div>
 
       {/* Toast for alerts */}
@@ -142,17 +154,16 @@ const Notes = () => {
       {/* Add New Note */}
       <Card className="mb-3 p-3">
         <div>
-          <input
-            type="text"
-            className="form-control"
-            placeholder="New note content"
+          <ReactQuill
+            theme="snow"
             value={newNote}
-            onChange={(e) => setNewNote(e.target.value)}
+            onChange={setNewNote}
+            placeholder="New note content"
           />
           <div className="input-group mt-2">
             <DatePicker
               selected={reminderTime}
-              onChange={(date) => setReminderTime(date)}
+              onChange={date => setReminderTime(date)}
               minDate={new Date()}
               filterTime={filterPassedTime}
               showTimeSelect
@@ -162,7 +173,9 @@ const Notes = () => {
               placeholderText="Set reminder (optional)"
             />
           </div>
-          <button className="btn btn-success mt-2" onClick={createNote}>Add Note</button>
+          <button className="btn btn-success mt-2" onClick={createNote}>
+            Add Note
+          </button>
         </div>
       </Card>
 
@@ -175,28 +188,49 @@ const Notes = () => {
           onChange={handleSearchChange}
         />
       </div>
+
       {/* Notes List */}
       {filteredNotes.length === 0 ? (
         <p>No notes found</p>
       ) : (
-      <>
-      <h4>My Notes</h4>
-      <ul className="list-group">
-        {filteredNotes.map((note) => (
-          <li key={note.id} className="list-group-item d-flex justify-content-between align-items-center">
-            <div className="d-flex flex-column">
-              <span>{note.content}</span>
-              <span className="text-muted">{note.reminder_time ? "Reminder set" : "No reminder set"}</span>
-              <small className="text-muted font-italic"><em>{note.reminder_time && new Date(note.reminder_time).toLocaleString()}</em></small>
-            </div>
-            <div>
-              <button className="btn btn-warning mx-2" onClick={() => handleShowModal(note)}>Update</button>
-              <button className="btn btn-danger" onClick={() => deleteNote(note.id)}>Delete</button>
-            </div>
-          </li>
-        ))}
-      </ul>
-      </>
+        <>
+          <h4>My Notes</h4>
+          <ul className="list-group mb-3">
+            {filteredNotes.map(note => (
+              <li
+                key={note.id}
+                className="list-group-item d-flex justify-content-between align-items-center"
+              >
+                <div className="d-flex flex-column">
+                  <span dangerouslySetInnerHTML={{ __html: note.content }} />
+                  <span className="text-muted">
+                    {note.reminder_time ? "Reminder set" : "No reminder set"}
+                  </span>
+                  <small className="text-muted font-italic">
+                    <em>
+                      {note.reminder_time &&
+                        new Date(note.reminder_time).toLocaleString()}
+                    </em>
+                  </small>
+                </div>
+                <div>
+                  <button
+                    className="btn btn-warning mx-2"
+                    onClick={() => handleShowModal(note)}
+                  >
+                    Update
+                  </button>
+                  <button
+                    className="btn btn-danger"
+                    onClick={() => deleteNote(note.id)}
+                  >
+                    Delete
+                  </button>
+                </div>
+              </li>
+            ))}
+          </ul>
+        </>
       )}
 
       {/* Update Note Modal */}
@@ -207,17 +241,19 @@ const Notes = () => {
         <Modal.Body>
           <Form.Group>
             <Form.Label>Content</Form.Label>
-            <Form.Control
-              type="text"
+            <ReactQuill
+              theme="snow"
               value={currentNote?.content || ""}
-              onChange={(e) => setCurrentNote({ ...currentNote, content: e.target.value })}
+              onChange={content =>
+                setCurrentNote({ ...currentNote, content })
+              }
             />
           </Form.Group>
           <Form.Group className="mt-3">
             <Form.Label>Reminder Time (optional)</Form.Label>
             <DatePicker
               selected={modalReminderTime}
-              onChange={(date) => setModalReminderTime(date)}
+              onChange={date => setModalReminderTime(date)}
               minDate={new Date()}
               filterTime={filterPassedTime}
               showTimeSelect

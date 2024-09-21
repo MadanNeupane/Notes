@@ -140,7 +140,6 @@ def delete_note(current_user, note_id):
     return jsonify({"message": "Note deleted successfully"}), 200
 
 # TODO:
-# 8. Set reminder on notes
 # 9. Send email to users with reminders
 
 

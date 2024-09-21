@@ -31,7 +31,7 @@
 `cp .env.example .env`
 - Edit `.env` to configure your environment variables (e.g., Flask app secret, database URI, JWT settings).
 6. Start the Flask development server:
-`flask run`
+`py main.py`
 
 ### Frontend (React)
 1. Navigate to the frontend directory:

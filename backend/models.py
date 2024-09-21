@@ -38,6 +38,9 @@ class Note(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     user = db.relationship('User', backref='notes')
 
+    # Establish relationship with reminders and add cascade delete
+    reminders = db.relationship('Reminder', backref='note', cascade="all, delete-orphan")
+
     def to_json(self):
         return {
             'id': self.id,
@@ -54,7 +57,6 @@ class Reminder(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     note_id = db.Column(db.Integer, db.ForeignKey('notes.id'), nullable=False)
-    note = db.relationship('Note', backref='reminders')
     is_sent = db.Column(db.Boolean, default=False)
     last_delivered_at = db.Column(db.DateTime, nullable=True)
 

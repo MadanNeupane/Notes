@@ -159,7 +159,6 @@ def create_or_update_reminder():
     else:
         # Create a new reminder
         new_reminder = Reminder(note_id=note_id)
-        new_reminder.note.reminder_time = reminder_time
         db.session.add(new_reminder)
         db.session.commit()
         return jsonify({'message': 'Reminder created successfully'}), 201

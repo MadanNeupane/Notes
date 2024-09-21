@@ -2,7 +2,7 @@ from flask import request, jsonify
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
 from datetime import datetime, timedelta
 from config import app, db
-from models import User, Note
+from models import User, Note, Reminder
 from auth_helpers import login_required
 
 # Register new user
@@ -138,6 +138,28 @@ def delete_note(current_user, note_id):
     db.session.delete(note)
     db.session.commit()
     return jsonify({"message": "Note deleted successfully"}), 200
+
+# Set or update reminder
+@app.route('/reminders', methods=['POST'])
+def create_or_update_reminder():
+    data = request.get_json()
+    note_id = data.get('note_id')
+    reminder_time = data.get('reminder_time')
+
+    # Check if the reminder already exists
+    reminder = Reminder.query.filter_by(note_id=note_id).first()
+
+    if reminder:
+        # Update the existing reminder
+        reminder.note.reminder_time = reminder_time
+        db.session.commit()
+        return jsonify({'message': 'Reminder updated successfully'}), 200
+    else:
+        # Create a new reminder
+        new_reminder = Reminder(note_id=note_id)
+        db.session.add(new_reminder)
+        db.session.commit()
+        return jsonify({'message': 'Reminder created successfully'}), 201
 
 # TODO:
 # 9. Send email to users with reminders

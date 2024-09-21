@@ -35,7 +35,7 @@ const Home = ({ loggedIn }) => {
                   <h3>Logged in as <strong>{username}</strong></h3>
                   <div className="mt-3">
                     <Link to="/notes">
-                      <Button variant="primary" className="mx-2">View Notes</Button>
+                      <Button variant="dark" className="mx-2">View Notes</Button>
                     </Link>
                     <Link to="/logout">
                       <Button variant="danger" className="mx-2">Logout</Button>
@@ -47,7 +47,7 @@ const Home = ({ loggedIn }) => {
           ) : (
             <div className="mt-4">
               <Link to="/login">
-                <Button variant="primary" className="mx-2">Login</Button>
+                <Button variant="dark" className="mx-2">Login</Button>
               </Link>
               <Link to="/register">
                 <Button variant="secondary" className="mx-2">Register</Button>

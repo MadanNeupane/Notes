@@ -285,7 +285,7 @@ const Notes = () => {
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={() => setShowModal(false)}>Close</Button>
-          <Button variant="primary" onClick={updateNote}>Save Changes</Button>
+          <Button variant="dark" onClick={updateNote}>Save Changes</Button>
         </Modal.Footer>
       </Modal>
 

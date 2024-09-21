@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Container, Col, Form, Button, Alert } from 'react-bootstrap';
+import api from '../../api';
 
 const Register = () => {
   const [username, setUsername] = useState('');
@@ -14,20 +15,20 @@ const Register = () => {
     setError('');
 
     try {
-      const response = await fetch('http://127.0.0.1:5000/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, email, password }),
+      const response = await api.post('/register', {
+        username,
+        email,
+        password,
       });
-      const data = await response.json();
 
-      if (response.ok) {
+      if (response.status === 201) {
         navigate('/login');
       } else {
-        setError(data.error || 'Registration failed');
+        setError(response.data.error || 'Registration failed');
       }
     } catch (error) {
       console.error('Registration Error:', error);
+      setError('Registration failed');
     }
   };
 
@@ -68,7 +69,7 @@ const Register = () => {
 
           {error && <Alert variant="danger" className="mt-2">{error}</Alert>}
 
-          <Button type="submit" className="mt-4 w-100" variant="primary">
+          <Button type="submit" className="mt-4 w-100" variant="dark">
             Register
           </Button>
 

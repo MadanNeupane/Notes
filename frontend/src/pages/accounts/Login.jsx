@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Container, Col, Form, Button } from 'react-bootstrap';
+import api from '../../api';
 
 const Login = ({ setLoggedIn }) => {
   const [email, setEmailInput] = useState('');
@@ -20,23 +21,18 @@ const Login = ({ setLoggedIn }) => {
     }
 
     try {
-      const response = await fetch('http://127.0.0.1:5000/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
-      });
-      const data = await response.json();
+      const response = await api.post('/login', { email, password });
 
-      if (response.ok) {
-        localStorage.setItem('token', data.token);
-        localStorage.setItem('username', data.username);
-        setLoggedIn(true);
-        navigate('/');
-      } else {
-        setPasswordError('Invalid credentials');
-      }
+      const { token, username } = response.data;
+
+      localStorage.setItem('token', token);
+      localStorage.setItem('username', username);
+
+      setLoggedIn(true);
+      navigate('/');
     } catch (error) {
       console.error('Error during login:', error);
+      setPasswordError('Invalid credentials');
     }
   };
 
@@ -69,7 +65,7 @@ const Login = ({ setLoggedIn }) => {
             <Form.Control.Feedback type="invalid">{passwordError}</Form.Control.Feedback>
           </Form.Group>
 
-          <Button type="submit" className="mt-4 w-100" variant="primary">
+          <Button type="submit" className="mt-4 w-100" variant="dark">
             Log In
           </Button>
 

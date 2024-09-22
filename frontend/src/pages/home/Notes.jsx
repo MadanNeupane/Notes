@@ -3,8 +3,8 @@ import api from "../../api";
 import { Modal, Button, Form, ToastContainer, Toast, Card } from "react-bootstrap";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import ReactQuill from "react-quill";
-import "react-quill/dist/quill.snow.css";
+import ReactQuill from "react-quill-new";
+import "react-quill-new/dist/quill.snow.css";
 
 const Notes = () => {
   // State management

@@ -50,7 +50,7 @@
 1.  **React Bootstrap** - For styling and UI components.\
 Documentation: [React Bootstrap Docs](https://react-bootstrap.netlify.app/docs/getting-started/introduction)
 2.  **React Quill** - A rich text editor for note content.\
-NPM: [React Quill](https://www.npmjs.com/package/react-quill)
+Github: [React Quill (new)](https://github.com/VaguelySerious/react-quill)
 3.  **React Datepicker** - For selecting reminder times.\
 NPM: [React Datepicker](https://www.npmjs.com/package/react-datepicker)
 

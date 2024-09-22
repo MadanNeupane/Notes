@@ -1,26 +1,7 @@
-import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import api from '../api';
 import { Container, Row, Col, Button, Card } from 'react-bootstrap';
 
-const Home = ({ loggedIn }) => {
-  const [username, setUsername] = useState('');
-
-  useEffect(() => {
-    if (loggedIn) {
-      const fetchUser = async () => {
-        try {
-          const response = await api.get('/me');
-          setUsername(response.data.username);
-        } catch (err) {
-          console.error('Error fetching user data', err);
-        }
-      };
-
-      fetchUser();
-    }
-  }, [loggedIn]);
-
+const Home = ({ loggedIn, userName }) => {
   return (
     <Container className="d-flex align-items-center justify-content-center min-vh-100">
       <Row className="text-center">
@@ -32,7 +13,7 @@ const Home = ({ loggedIn }) => {
             <>
               <Card className="mt-4">
                 <Card.Body>
-                  <h3>Logged in as <strong>{username}</strong></h3>
+                  <h3>Logged in as <strong>{userName}</strong></h3>
                   <div className="mt-3">
                     <Link to="/notes">
                       <Button variant="dark" className="mx-2">View Notes</Button>

@@ -6,7 +6,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import ReactQuill from "react-quill-new";
 import "react-quill-new/dist/quill.snow.css";
 
-const Notes = () => {
+const Notes = ({ userName }) => {
   // State management
   const [notes, setNotes] = useState([]);
   const [newNote, setNewNote] = useState("");
@@ -18,13 +18,11 @@ const Notes = () => {
   const [currentNote, setCurrentNote] = useState(null);
   const [toastMessage, setToastMessage] = useState("");
   const [showToast, setShowToast] = useState(false);
-  const [username, setUsername] = useState("");
   const [autosaveEnabled, setAutosaveEnabled] = useState(false);
   const autosaveTimeoutRef = useRef(null);
 
   useEffect(() => {
     fetchNotes();
-    fetchUser();
   }, []);
 
   // Filter notes based on search query
@@ -59,15 +57,6 @@ const Notes = () => {
     } catch (err) {
       showToastMessage("Error fetching notes");
       console.error("Error fetching notes", err);
-    }
-  };
-
-  const fetchUser = async () => {
-    try {
-      const response = await api.get("/me");
-      setUsername(response.data.username);
-    } catch (err) {
-      console.error("Error fetching user data", err);
     }
   };
 
@@ -179,7 +168,7 @@ const Notes = () => {
   return (
     <div className="container mt-4">
       <div className="d-flex justify-content-end mb-3 align-items-center gap-2">
-        <span>Hello, {username}</span>
+        <span>Hello, {userName}</span>
         <button className="btn btn-secondary" onClick={handleLogout}>Logout</button>
       </div>
 

@@ -1,7 +1,9 @@
 import { Link } from 'react-router-dom';
 import { Container, Row, Col, Button, Card } from 'react-bootstrap';
 
-const Home = ({ loggedIn, userName }) => {
+const Home = ({ loggedIn }) => {
+  const userName = localStorage.getItem('username');
+
   return (
     <Container className="d-flex align-items-center justify-content-center min-vh-100">
       <Row className="text-center">

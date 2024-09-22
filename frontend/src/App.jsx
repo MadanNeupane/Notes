@@ -60,8 +60,8 @@ const App = () => {
         />
         <Route path="/register" element={<Register />} />
         <Route path="/logout" element={<Logout />} />
-        <Route path="/" element={<Home loggedIn={loggedIn} userName={userName} />} />
-        <Route path="/notes" element={loggedIn ? <Notes userName={userName} /> : <Navigate to="/login" />} />
+        <Route path="/" element={<Home loggedIn={loggedIn} />} />
+        <Route path="/notes" element={loggedIn ? <Notes /> : <Navigate to="/login" />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>

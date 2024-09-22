@@ -6,7 +6,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import ReactQuill from "react-quill-new";
 import "react-quill-new/dist/quill.snow.css";
 
-const Notes = ({ userName }) => {
+const Notes = () => {
   // State management
   const [notes, setNotes] = useState([]);
   const [newNote, setNewNote] = useState("");
@@ -20,6 +20,8 @@ const Notes = ({ userName }) => {
   const [showToast, setShowToast] = useState(false);
   const [autosaveEnabled, setAutosaveEnabled] = useState(false);
   const autosaveTimeoutRef = useRef(null);
+
+  const userName = localStorage.getItem("username");
 
   useEffect(() => {
     fetchNotes();

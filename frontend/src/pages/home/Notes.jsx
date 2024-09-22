@@ -138,11 +138,11 @@ const Notes = () => {
       fetchNotes();
       await handleReminder(noteId, reminderTime);
 
-      const timeMessage = calculateRemainingTime(reminderTime);
-      showToastMessage(reminderTime ? `Note created successfully. You'll be reminded in ${timeMessage}` : "Note created successfully");
+      showToastMessage(reminderTime ? `Note created successfully. You'll be reminded in ${calculateRemainingTime(reminderTime)}` : "Note created successfully");
     } catch (err) {
       showToastMessage("Error creating note");
       console.error("Error creating note", err);
+      return;
     }
   };
 
@@ -169,7 +169,7 @@ const Notes = () => {
       await handleReminder(currentNote.id, modalReminderTime);
       fetchNotes();
       setShowModal(false);
-      showToastMessage("Note updated successfully");
+      showToastMessage(modalReminderTime ? `Note updated successfully. You'll be reminded in ${calculateRemainingTime(modalReminderTime)}` : "Note updated successfully");
     } catch (err) {
       showToastMessage("Error updating note");
       console.error("Error updating note", err);

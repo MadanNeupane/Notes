@@ -134,9 +134,12 @@ def update_note(current_user, note_id):
         note.content = content
 
     reminder_time_str = data.get('reminder_time')
-    reminder_time = parse_reminder_time(reminder_time_str)
-    if reminder_time:
+    print(reminder_time_str, "reminder_time_str")
+    if reminder_time_str != None:
+        reminder_time = parse_reminder_time(reminder_time_str)
         note.reminder_time = reminder_time
+    else:
+        note.reminder_time = None
 
     db.session.commit()
     return jsonify(note.to_json()), 200
@@ -166,7 +169,7 @@ def create_or_update_reminder():
 
     if reminder:
         # Update the existing reminder
-        reminder.note.reminder_time = reminder_time
+        # reminder.note.reminder_time = parse_reminder_time(reminder_time)
         reminder.last_delivered_at = None
         reminder.is_sent = False
         db.session.commit()

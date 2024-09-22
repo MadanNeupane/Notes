@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { Spinner, Container } from 'react-bootstrap';
 import Login from './pages/accounts/Login';
 import Register from './pages/accounts/Register';
 import Home from './pages/Home';
@@ -43,7 +44,11 @@ const App = () => {
   };
 
   if (loading) {
-    return <div>Loading...</div>;
+    return (
+      <Container className="d-flex justify-content-center align-items-center min-vh-100">
+        <Spinner animation="border" role="status" variant="dark"></Spinner>
+      </Container>
+    );
   }
 
   return (

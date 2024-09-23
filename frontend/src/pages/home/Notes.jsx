@@ -51,7 +51,7 @@ const Notes = () => {
     return () => clearTimeout(autosaveTimeoutRef.current);
   }, [newNote, autosaveEnabled]);
 
-  // Fetch notes and user data
+  // Fetch notes
   const fetchNotes = async () => {
     try {
       const response = await api.get("/notes");
@@ -185,7 +185,7 @@ const Notes = () => {
           <DatePicker
             selected={reminderTime}
             onChange={setReminderTime}
-            minDate={new Date()}
+            filterDate={date => date >= new Date()}
             filterTime={time => new Date() < new Date(time)}
             showTimeSelect
             dateFormat="Pp"
@@ -264,7 +264,7 @@ const Notes = () => {
             <DatePicker
               selected={modalReminderTime}
               onChange={setModalReminderTime}
-              minDate={new Date()}
+              filterDate={date => date >= new Date()}
               filterTime={time => new Date() < new Date(time)}
               showTimeSelect
               dateFormat="Pp"

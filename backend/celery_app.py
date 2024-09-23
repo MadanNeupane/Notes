@@ -1,8 +1,8 @@
 import os
 from celery import Celery
-from flask import Flask
+from flask import Flask, current_app
 from flask_mail import Mail, Message
-from config import db, CELERY_BROKER_URL, CELERY_RESULT_BACKEND, MAIL_USERNAME
+from config import db, CELERY_BROKER_URL, CELERY_RESULT_BACKEND
 from models import Note, User, Reminder
 from datetime import datetime, timedelta, timezone
 
@@ -12,7 +12,9 @@ app = Flask(__name__)
 celery = Celery(__name__, broker=CELERY_BROKER_URL, backend=CELERY_RESULT_BACKEND)
 
 # Initialize Mail
-mail = Mail(app)
+# mail = Mail(app)
+MAIL_USERNAME = os.getenv('MAIL_USERNAME')
+mail = Mail(current_app)
 
 # Define the periodic task
 @celery.task

@@ -4,7 +4,7 @@ import { Spinner, Container } from 'react-bootstrap';
 import Login from './pages/accounts/Login';
 import Register from './pages/accounts/Register';
 import Home from './pages/Home';
-import Notes from './pages/home/Notes';
+import Notes from './pages/Notes';
 import NotFound from './pages/NotFound';
 import api from './api';
 
@@ -27,8 +27,7 @@ const App = () => {
           setLoggedIn(true);
           setUserName(response.data.username);
         })
-        .catch(error => {
-          console.error('Error fetching user data', error);
+        .catch(() => {
           handleLogout();
         })
         .finally(() => setLoading(false));
@@ -46,7 +45,7 @@ const App = () => {
   if (loading) {
     return (
       <Container className="d-flex justify-content-center align-items-center min-vh-100">
-        <Spinner animation="border" role="status" variant="dark"></Spinner>
+        <Spinner animation="border" role="status" variant="dark" />
       </Container>
     );
   }

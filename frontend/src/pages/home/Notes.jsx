@@ -199,10 +199,14 @@ const Notes = () => {
           <Form.Check
             type="switch"
             id="autosave-switch"
-            label="Enable Autosave"
-            title="This will save your note in 10 seconds of inactivity"
+            label="Autosave"
             checked={autosaveEnabled}
-            onChange={() => setAutosaveEnabled(!autosaveEnabled)}
+            onChange={() => {
+              setAutosaveEnabled(!autosaveEnabled);
+              if (!autosaveEnabled) {
+                showToastMessage("Autosave is enabled. Notes will be saved automatically after 10 seconds of inactivity.");
+              }
+            }}
           />
         </div>
       </Card>
@@ -281,7 +285,7 @@ const Notes = () => {
       </Modal>
 
       {/* Toast Message */}
-      <ToastContainer position="bottom-center" className="p-3">
+      <ToastContainer className="p-3 position-fixed bottom-0 start-50 translate-middle-x">
         <Toast show={showToast} onClose={() => setShowToast(false)} className="mb-3">
           <Toast.Body>{toastMessage}</Toast.Body>
         </Toast>

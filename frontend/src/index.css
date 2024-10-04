@@ -20,6 +20,10 @@ body {
   box-sizing: border-box;
 }
 
+p{
+  margin: 0;
+}
+
 main {
   padding: 5rem 0;
   flex: 1;
@@ -50,4 +54,13 @@ input[type='button'] {
   font-size: 24px;
   border-radius: 8px;
   cursor: pointer;
+}
+
+/* React Quill */
+span li[data-list='bullet'] {
+  list-style-type: disc;
+}
+
+.ql-tooltip.ql-editing {
+  margin-top: -30px;
 }

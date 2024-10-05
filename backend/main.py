@@ -181,8 +181,6 @@ def create_or_update_reminder():
         db.session.commit()
         return jsonify({'message': 'Reminder created successfully'}), 201
 
-# TODO:
-# 9. Send email to users with reminders
 
 
 if __name__ == "__main__":

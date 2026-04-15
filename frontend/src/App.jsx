@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Spinner, Container } from 'react-bootstrap';
 import Login from './pages/accounts/Login';
@@ -15,32 +15,29 @@ const Logout = () => {
 
 const App = () => {
   const [loggedIn, setLoggedIn] = useState(false);
-  const [userName, setUserName] = useState('');
   const [loading, setLoading] = useState(true);
+
+  const handleLogout = useCallback(() => {
+    localStorage.clear();
+    setLoggedIn(false);
+  }, []);
 
   useEffect(() => {
     const token = localStorage.getItem('token');
 
     if (token) {
       api.get('/me')
-        .then(response => {
+        .then(() => {
           setLoggedIn(true);
-          setUserName(response.data.username);
         })
         .catch(() => {
           handleLogout();
         })
         .finally(() => setLoading(false));
     } else {
-      setLoading(false);
+      setTimeout(() => setLoading(false), 0);
     }
-  }, []);
-
-  const handleLogout = () => {
-    localStorage.clear();
-    setLoggedIn(false);
-    setUserName('');
-  };
+  }, [handleLogout]);
 
   if (loading) {
     return (
@@ -55,7 +52,7 @@ const App = () => {
       <Routes>
         <Route
           path="/login"
-          element={<Login setLoggedIn={setLoggedIn} setUserName={setUserName} />}
+          element={<Login setLoggedIn={setLoggedIn} />}
         />
         <Route path="/register" element={<Register />} />
         <Route path="/logout" element={<Logout />} />

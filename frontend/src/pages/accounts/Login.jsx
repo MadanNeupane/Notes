@@ -70,7 +70,7 @@ const Login = ({ setLoggedIn }) => {
           </Button>
 
           <div className="text-center mt-2">
-            Don't have an account? <Link to="/register">Register here</Link>.
+            Don&apos;t have an account? <Link to="/register">Register here</Link>.
           </div>
         </Form>
       </Col>

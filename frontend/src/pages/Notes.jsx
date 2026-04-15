@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { Link } from 'react-router-dom';
 import api from "../api";
 import NoteForm from "../components/NoteForm";
@@ -30,7 +30,7 @@ const Notes = () => {
 
   useEffect(() => {
     fetchNotes();
-  }, []);
+  }, [fetchNotes]);
 
   useEffect(() => {
     const filtered = searchQuery
@@ -51,30 +51,30 @@ const Notes = () => {
       }, 10000);
     }
     return () => clearTimeout(autosaveTimeoutRef.current);
-  }, [newNote, autosaveEnabled]);
+  }, [newNote, autosaveEnabled, createNote]);
 
   // Helper functions
   const formatReminderTime = date => date ? date.toISOString().slice(0, 19).replace("T", " ") : null;
 
-  const handleReminder = async (noteId, reminderTime) => {
+  const handleReminder = useCallback(async (noteId, reminderTime) => {
     if (reminderTime) {
       await api.post(`/reminders`, {
         note_id: noteId,
         reminder_time: formatReminderTime(reminderTime),
       });
     }
-  };
+  }, []);
 
-  const fetchNotes = async () => {
+  const fetchNotes = useCallback(async () => {
     try {
       const response = await api.get("/notes");
       setNotes(response.data.sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at)));
-    } catch (err) {
+    } catch {
       showToastMessage("Error fetching notes");
     }
-  };
+  }, [showToastMessage]);
 
-  const createNote = async () => {
+  const createNote = useCallback(async () => {
     if (newNote.length < 5) {
       showToastMessage("Note content must be at least 5 characters long");
       return;
@@ -96,32 +96,32 @@ const Notes = () => {
       } else {
         showToastMessage("Note created successfully.");
       }
-    } catch (err) {
+    } catch {
       showToastMessage("Error creating note");
     }
-  };
+  }, [newNote, reminderTime, handleReminder, showToastMessage]);
 
   const deleteNote = async id => {
     setNoteToDelete(id);
     setShowDeleteConfirmation(true);
   };
 
-  const confirmDeleteNote = async () => {
+  async function confirmDeleteNote() {
     if (!noteToDelete) return;
 
     try {
       await api.delete(`/notes/${noteToDelete}`);
       setNotes(prevNotes => prevNotes.filter(note => note.id !== noteToDelete));
       showToastMessage("Note deleted successfully");
-    } catch (err) {
+    } catch {
       showToastMessage("Error deleting note");
     } finally {
       setShowDeleteConfirmation(false);
       setNoteToDelete(null);
     }
-  };
+  }
 
-  const updateNote = async () => {
+  async function updateNote() {
     if (currentNote.content.length < 5) {
       showToastMessage("Note content must be at least 5 characters long");
       return;
@@ -147,16 +147,16 @@ const Notes = () => {
       } else {
         showToastMessage("Note updated successfully");
       }
-    } catch (err) {
+    } catch {
       showToastMessage("Error updating note");
     }
-  };
+  }
 
-  const showToastMessage = message => {
+  const showToastMessage = useCallback(message => {
     setToastMessage(message);
     setShowToast(true);
     setTimeout(() => setShowToast(false), 3000);
-  };
+  }, []);
 
   return (
     <div className="container mt-4">

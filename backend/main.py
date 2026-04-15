@@ -23,11 +23,9 @@ def index(filename):
 # Register new user
 @app.route("/register", methods=["POST"])
 def register():
-    print(request.json, 'request.json')
     username = request.json["username"]
     email = request.json["email"]
     password = request.json["password"]
-    print("Registering user:", username, email, password)
 
     if not username or not email or not password:
         return jsonify({"error": "Username, email, and password are required"}), 400
@@ -134,7 +132,6 @@ def update_note(current_user, note_id):
         note.content = content
 
     reminder_time_str = data.get('reminder_time')
-    print(reminder_time_str, "reminder_time_str")
     if reminder_time_str != None:
         reminder_time = parse_reminder_time(reminder_time_str)
         note.reminder_time = reminder_time

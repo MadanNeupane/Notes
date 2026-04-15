@@ -28,33 +28,13 @@ const Notes = () => {
   const autosaveTimeoutRef = useRef(null);
   const userName = localStorage.getItem("username");
 
-  useEffect(() => {
-    fetchNotes();
-  }, [fetchNotes]);
+  const formatReminderTime = useCallback(date => date ? date.toISOString().slice(0, 19).replace("T", " ") : null, []);
 
-  useEffect(() => {
-    const filtered = searchQuery
-      ? notes.filter(note =>
-          note.content.toLowerCase().includes(searchQuery.toLowerCase())
-        )
-      : notes;
-
-    setFilteredNotes(filtered.sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at)));
-  }, [searchQuery, notes]);
-
-  useEffect(() => {
-    if (autosaveEnabled && newNote.length > 5) {
-      clearTimeout(autosaveTimeoutRef.current);
-      autosaveTimeoutRef.current = setTimeout(() => {
-        createNote();
-        setNewNote("");
-      }, 10000);
-    }
-    return () => clearTimeout(autosaveTimeoutRef.current);
-  }, [newNote, autosaveEnabled, createNote]);
-
-  // Helper functions
-  const formatReminderTime = date => date ? date.toISOString().slice(0, 19).replace("T", " ") : null;
+  const showToastMessage = useCallback(message => {
+    setToastMessage(message);
+    setShowToast(true);
+    setTimeout(() => setShowToast(false), 3000);
+  }, []);
 
   const handleReminder = useCallback(async (noteId, reminderTime) => {
     if (reminderTime) {
@@ -63,7 +43,7 @@ const Notes = () => {
         reminder_time: formatReminderTime(reminderTime),
       });
     }
-  }, []);
+  }, [formatReminderTime]);
 
   const fetchNotes = useCallback(async () => {
     try {
@@ -99,8 +79,34 @@ const Notes = () => {
     } catch {
       showToastMessage("Error creating note");
     }
-  }, [newNote, reminderTime, handleReminder, showToastMessage]);
+  }, [newNote, reminderTime, formatReminderTime, handleReminder, showToastMessage]);
 
+  useEffect(() => {
+    fetchNotes();
+  }, [fetchNotes]);
+
+  useEffect(() => {
+    const filtered = searchQuery
+      ? notes.filter(note =>
+          note.content.toLowerCase().includes(searchQuery.toLowerCase())
+        )
+      : notes;
+
+    setFilteredNotes(filtered.sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at)));
+  }, [searchQuery, notes]);
+
+  useEffect(() => {
+    if (autosaveEnabled && newNote.length > 5) {
+      clearTimeout(autosaveTimeoutRef.current);
+      autosaveTimeoutRef.current = setTimeout(() => {
+        createNote();
+        setNewNote("");
+      }, 10000);
+    }
+    return () => clearTimeout(autosaveTimeoutRef.current);
+  }, [newNote, autosaveEnabled, createNote]);
+
+  // Helper functions
   const deleteNote = async id => {
     setNoteToDelete(id);
     setShowDeleteConfirmation(true);
@@ -151,12 +157,6 @@ const Notes = () => {
       showToastMessage("Error updating note");
     }
   }
-
-  const showToastMessage = useCallback(message => {
-    setToastMessage(message);
-    setShowToast(true);
-    setTimeout(() => setShowToast(false), 3000);
-  }, []);
 
   return (
     <div className="container mt-4">
